@@ -112,6 +112,7 @@ function ProfileEditor({ profile, onSave, onCancel, showNotification }) {
     }
 
     try {
+      setError(null);
       const profileData = {
         id: profile?.id,
         name: name.trim(),
@@ -126,7 +127,8 @@ function ProfileEditor({ profile, onSave, onCancel, showNotification }) {
 
       await onSave(profileData);
     } catch (err) {
-      setError(err.message);
+      console.error('Błąd zapisywania profilu:', err);
+      setError('Nie udało się zapisać profilu. Spróbuj ponownie.');
     }
   };
 

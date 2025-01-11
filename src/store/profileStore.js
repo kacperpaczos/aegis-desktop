@@ -64,30 +64,43 @@ const useProfileStore = create((set, get) => ({
   },
 
   updateProfile: async (id, updatedData) => {
+    console.log('📝 Rozpoczynam aktualizację profilu:', {
+      id,
+      aktualizowaneDane: updatedData
+    });
+    
     set(state => ({
       loadingStates: { ...state.loadingStates, isSaving: true }
     }));
+    
     try {
       const updatedProfile = {
         ...updatedData,
         id,
         updatedAt: new Date().toISOString()
       };
-
+      
+      console.log('🔄 Rozpoczynam synchronizację z serwerem');
+      await profileApi.syncProfiles([
+        ...get().profiles.filter(p => p.id !== id),
+        updatedProfile
+      ]);
+      console.log('✅ Synchronizacja zakończona pomyślnie');
+      
       set(state => ({
         profiles: state.profiles.map(p => p.id === id ? updatedProfile : p),
-        loadingStates: { ...state.loadingStates, isSaving: false }
+        loadingStates: { ...state.loadingStates, isSaving: false },
+        syncError: null
       }));
-
-      await profileApi.syncProfiles(get().profiles);
-      set({ syncError: null });
+      
       return updatedProfile;
     } catch (error) {
+      console.error('❌ Błąd podczas aktualizacji profilu:', error);
       set(state => ({ 
-        syncError: 'Nie udało się zaktualizować profilu',
+        syncError: error.message || 'Nie udało się zaktualizować profilu',
         loadingStates: { ...state.loadingStates, isSaving: false }
       }));
-      throw new Error('Nie udało się zaktualizować profilu');
+      throw error;
     }
   },
 

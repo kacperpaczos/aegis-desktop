@@ -50,17 +50,42 @@ export const profileApi = {
   async syncProfiles(profiles) {
     const url = '/api/v1/profile/sync';
     const payload = { profiles };
-    logRequest('POST', url, payload);
     
-    const response = await fetch(url, {
-      ...defaultOptions,
-      method: 'POST',
-      body: JSON.stringify(payload)
+    console.log('🔄 Rozpoczynam synchronizację profili:', {
+      liczbaProfilów: profiles.length,
+      profile: profiles.map(p => ({
+        id: p.id,
+        name: p.name,
+        updatedAt: p.updatedAt
+      }))
     });
     
-    const data = await handleResponse(response);
-    logResponse('POST', url, response.status, data);
-    return data;
+    logRequest('POST', url, payload);
+    
+    try {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await handleResponse(response);
+      
+      if (data.status === 'error' && data.message.includes('Invalid access')) {
+        throw new Error('Brak uprawnień dostępu do serwera. Sprawdź swoje uprawnienia.');
+      }
+      
+      console.log('✅ Synchronizacja zakończona:', {
+        status: response.status,
+        odpowiedźSerwera: data
+      });
+      
+      logResponse('POST', url, response.status, data);
+      return data;
+    } catch (error) {
+      console.error('❌ Błąd synchronizacji:', error);
+      throw error;
+    }
   },
 
   async trainFaceModel(profileId) {
