@@ -1,49 +1,72 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
+import { useState, useEffect } from "react";
+import ProfileList from "./components/ProfileList";
+import ProfileEditor from "./components/ProfileEditor";
 import "./App.css";
+import useProfileStore from "./store/profileStore";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [selectedProfile, setSelectedProfile] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const profiles = useProfileStore(state => state.profiles);
+  const syncError = useProfileStore(state => state.syncError);
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+  useEffect(() => {
+    if (syncError) {
+      setShowToast(true);
+      const timer = setTimeout(() => {
+        setShowToast(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [syncError]);
+
+  const handleCreateProfile = () => {
+    setSelectedProfile(null);
+    setIsEditing(true);
+  };
+
+  const handleEditProfile = (profile) => {
+    setSelectedProfile(profile);
+    setIsEditing(true);
+  };
+
+  const handleSaveProfile = async (profileData) => {
+    try {
+      const store = useProfileStore.getState();
+      
+      if (profileData.id) {
+        await store.updateProfile(profileData.id, profileData);
+      } else {
+        await store.addProfile(profileData);
+      }
+      
+      setIsEditing(false);
+    } catch (err) {
+      console.error('Błąd zapisywania profilu:', err);
+      throw err;
+    }
+  };
 
   return (
     <main className="container">
-      <h1>Welcome to Tauri + React</h1>
-
-      <div className="row">
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
+      {syncError && showToast && (
+        <div className="sync-error-toast">
+          {syncError}
+        </div>
+      )}
+      {!isEditing ? (
+        <ProfileList 
+          onCreateProfile={handleCreateProfile}
+          onEditProfile={handleEditProfile}
         />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
+      ) : (
+        <ProfileEditor
+          profile={selectedProfile}
+          onSave={handleSaveProfile}
+          onCancel={() => setIsEditing(false)}
+        />
+      )}
     </main>
   );
 }
