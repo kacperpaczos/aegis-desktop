@@ -1,3 +1,16 @@
+:root {
+  --background-secondary: #f5f5f5;
+  --border-color: #ddd;
+  --text-primary: #333;
+  --text-secondary: #666;
+  --primary-color: #4CAF50;
+  --primary-color-dark: #45a049;
+  --disabled-color: #cccccc;
+  --error-color: #f44336;
+  --error-background: #ffebee;
+  --error-border: #ffcdd2;
+}
+
 .camera-container {
   display: flex;
   flex-direction: column;

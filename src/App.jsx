@@ -80,6 +80,7 @@ function App() {
           profile={selectedProfile}
           onSave={handleSaveProfile}
           onCancel={() => setIsEditing(false)}
+          showNotification={showNotification}
         />
       )}
     </main>

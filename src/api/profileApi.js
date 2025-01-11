@@ -61,5 +61,32 @@ export const profileApi = {
     const data = await handleResponse(response);
     logResponse('POST', url, response.status, data);
     return data;
+  },
+
+  async trainFaceModel(profileId) {
+    const url = '/api/v1/face/train';
+    const randomId = Math.random().toString(36).substring(7);
+    const payload = { 
+      profile_id: profileId,
+      video_path: `~/.facenet/videos/nagranie_${randomId}.mp4`
+    };
+    
+    logRequest('POST', url, payload);
+    
+    try {
+      const response = await fetch(url, {
+        ...defaultOptions,
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await handleResponse(response);
+      logResponse('POST', url, response.status, data);
+      return data;
+    } catch (err) {
+      console.error('Błąd podczas trenowania modelu:', err);
+      throw new Error('Nie udało się przetrenować modelu rozpoznawania twarzy. ' + 
+        (err.message || 'Sprawdź połączenie z serwerem.'));
+    }
   }
 }; 

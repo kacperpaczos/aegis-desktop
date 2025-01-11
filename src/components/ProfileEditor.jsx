@@ -4,8 +4,9 @@ import { invoke } from '@tauri-apps/api/core';
 import useProfileStore from '../store/profileStore';
 import { backgroundOptions, iconComponents } from '../config/profileConfig';
 import '../styles/ProfileEditor.css';
+import FaceTraining from './FaceTraining';
 
-function ProfileEditor({ profile, onSave, onCancel }) {
+function ProfileEditor({ profile, onSave, onCancel, showNotification }) {
   const [name, setName] = useState(profile?.name || '');
   const [pin, setPin] = useState(profile?.pin || '');
   const [confirmPin, setConfirmPin] = useState(profile?.pin || '');
@@ -236,6 +237,18 @@ function ProfileEditor({ profile, onSave, onCancel }) {
           />
         )}
       </div>
+
+      <FaceTraining 
+        profileId={profile?.id}
+        onComplete={() => {
+          setError(null);
+          showNotification('Model został wytrenowany pomyślnie', 'success');
+        }}
+        onError={(errorMessage) => {
+          setError(errorMessage);
+          showNotification(errorMessage, 'error');
+        }}
+      />
 
       <div className="editor-controls">
         <button onClick={handleSave} className="save-button">Zapisz</button>

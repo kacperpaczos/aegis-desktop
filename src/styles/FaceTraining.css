@@ -1,0 +1,75 @@
+.face-training {
+    margin: 20px 0;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+  }
+  
+  .face-training h3 {
+    margin: 0 0 10px 0;
+    color: var(--text-primary);
+    font-size: 1.2em;
+    font-weight: 500;
+  }
+  
+  .face-training p {
+    margin-bottom: 15px;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    line-height: 1.4;
+  }
+  
+  .training-button {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 250px;
+  }
+  
+  .training-button:hover:not(:disabled) {
+    background-color: var(--primary-color-dark);
+    transform: translateY(-1px);
+  }
+  
+  .training-button:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  .training-button:disabled {
+    background-color: var(--disabled-color);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .face-training .error {
+    margin-top: 12px;
+    padding: 10px;
+    color: var(--error-color);
+    background-color: var(--error-background);
+    border-radius: 4px;
+    font-size: 14px;
+    border: 1px solid var(--error-border);
+  }
+  
+  /* Animacja podczas trenowania */
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+  
+  .training-button:disabled {
+    animation: pulse 1.5s infinite;
+  }

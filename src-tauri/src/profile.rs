@@ -11,6 +11,7 @@ pub struct Profile {
     pub background: String,
     pub photos: Vec<String>,
     pub videos: Vec<String>,
+    pub facenet_path: Option<String>,
     pub created_at: String,
     pub updated_at: Option<String>,
 }
@@ -59,4 +60,18 @@ fn get_profiles_dir() -> Result<PathBuf, String> {
         .map_err(|e| format!("Błąd tworzenia katalogu profilów: {}", e))?;
     
     Ok(profiles_dir)
+}
+
+fn get_facenet_dir(profile_id: &str) -> Result<PathBuf, String> {
+    let exe_dir = std::env::current_exe()
+        .map_err(|e| format!("Błąd podczas pobierania ścieżki wykonywalnej: {}", e))?
+        .parent()
+        .ok_or("Nie można znaleźć katalogu wykonawczego")?
+        .to_path_buf();
+    
+    let facenet_dir = exe_dir.join(".facenet").join(profile_id);
+    fs::create_dir_all(&facenet_dir)
+        .map_err(|e| format!("Błąd tworzenia katalogu .facenet: {}", e))?;
+    
+    Ok(facenet_dir)
 } 
