@@ -86,8 +86,17 @@ function ProfileEditor({ profile, onSave, onCancel }) {
   }, [profile]);
 
   const handleSelectIcon = (iconName) => {
+    if (customAvatar) {
+      handleRemoveAvatar();
+    }
     setSelectedIcon(iconName);
-    setCustomAvatar(null);
+  };
+
+  const handleSelectBackground = (bgId) => {
+    if (customAvatar) {
+      handleRemoveAvatar();
+    }
+    setSelectedBackground(bgId);
   };
 
   const handleSave = async () => {
@@ -109,7 +118,9 @@ function ProfileEditor({ profile, onSave, onCancel }) {
         avatar: customAvatar || selectedIcon,
         background: selectedBackground,
         photos: profile?.photos || [],
-        videos: profile?.videos || []
+        videos: profile?.videos || [],
+        createdAt: profile?.createdAt || new Date().toISOString(),
+        updatedAt: profile ? new Date().toISOString() : null
       };
 
       await onSave(profileData);
@@ -156,34 +167,38 @@ function ProfileEditor({ profile, onSave, onCancel }) {
         </div>
         
         <div className="avatar-options">
-          <div className="default-avatars">
-            {defaultIcons.map((icon) => (
-              <div 
-                key={icon.name}
-                className={`default-avatar ${selectedIcon === icon.name ? 'selected' : ''}`}
-                onClick={() => handleSelectIcon(icon.name)}
-              >
-                <icon.component size={30} />
+          {!customAvatar && (
+            <>
+              <div className="default-avatars">
+                {defaultIcons.map((icon) => (
+                  <div 
+                    key={icon.name}
+                    className={`default-avatar ${selectedIcon === icon.name ? 'selected' : ''}`}
+                    onClick={() => handleSelectIcon(icon.name)}
+                  >
+                    <icon.component size={30} />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className="background-options">
-            {backgroundOptions.map((bg) => (
-              <div
-                key={bg.id}
-                className={`background-option ${selectedBackground === bg.id ? 'selected' : ''}`}
-                style={{ background: bg.style }}
-                onClick={() => setSelectedBackground(bg.id)}
-              />
-            ))}
-          </div>
+              <div className="background-options">
+                {backgroundOptions.map((bg) => (
+                  <div
+                    key={bg.id}
+                    className={`background-option ${selectedBackground === bg.id ? 'selected' : ''}`}
+                    style={{ background: bg.style }}
+                    onClick={() => handleSelectBackground(bg.id)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
           
           <div className="avatar-actions">
             <button className="photo-button" onClick={handleTakePhoto}>
-              <FaCamera /> Zrób zdjęcie
+              <FaCamera /> {customAvatar ? 'Zmień zdjęcie' : 'Zrób zdjęcie'}
             </button>
-            {(customAvatar || (profile?.avatar && !profile.avatar.startsWith('Fa'))) && (
+            {customAvatar && (
               <button onClick={handleRemoveAvatar} className="remove-avatar">
                 <FaTrash /> Usuń zdjęcie
               </button>

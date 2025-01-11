@@ -8,6 +8,7 @@ pub struct Profile {
     pub name: String,
     pub pin: Option<String>,
     pub avatar: String,
+    pub background: String,
     pub photos: Vec<String>,
     pub videos: Vec<String>,
     pub created_at: String,

@@ -1,0 +1,65 @@
+import { API_URL } from '../config/constants';
+
+const defaultOptions = {
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  credentials: 'same-origin'
+};
+
+const handleResponse = async (response) => {
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.message || 'Błąd połączenia z serwerem');
+  }
+  return response.json();
+};
+
+const logRequest = (method, url, data = null) => {
+  console.group(`🌐 API Request [${new Date().toLocaleTimeString()}]`);
+  console.log(`📤 ${method} ${url}`);
+  if (data) {
+    console.log('Request Payload:', JSON.stringify(data, null, 2));
+  }
+  console.groupEnd();
+};
+
+const logResponse = (method, url, status, data) => {
+  console.group(`📥 API Response [${new Date().toLocaleTimeString()}]`);
+  console.log(`${method} ${url}`);
+  console.log('Status:', status);
+  console.log('Response Data:', JSON.stringify(data, null, 2));
+  console.groupEnd();
+};
+
+export const profileApi = {
+  async loadAllProfiles() {
+    const url = '/api/v1/profile/get-all';
+    logRequest('GET', url);
+    
+    const response = await fetch(url, {
+      ...defaultOptions,
+      method: 'GET'
+    });
+    
+    const data = await handleResponse(response);
+    logResponse('GET', url, response.status, data);
+    return data;
+  },
+
+  async syncProfiles(profiles) {
+    const url = '/api/v1/profile/sync';
+    const payload = { profiles };
+    logRequest('POST', url, payload);
+    
+    const response = await fetch(url, {
+      ...defaultOptions,
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    
+    const data = await handleResponse(response);
+    logResponse('POST', url, response.status, data);
+    return data;
+  }
+}; 

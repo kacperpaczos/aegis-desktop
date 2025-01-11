@@ -11,6 +11,8 @@ function ProfileList({ onCreateProfile, onEditProfile }) {
   const [pinInput, setPinInput] = useState('');
   const [error, setError] = useState('');
   const [avatarPreviews, setAvatarPreviews] = useState({});
+  const [pinInputRef, setPinInputRef] = useState(null);
+  const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
     const loadPreviews = async () => {
@@ -47,6 +49,12 @@ function ProfileList({ onCreateProfile, onEditProfile }) {
     };
   }, [profiles]);
 
+  useEffect(() => {
+    if (pinInputRef) {
+      pinInputRef.focus();
+    }
+  }, [selectedProfile]);
+
   const renderAvatar = (profile) => {
     if (profile.avatar) {
       if (!profile.avatar.startsWith('Fa')) {
@@ -82,7 +90,14 @@ function ProfileList({ onCreateProfile, onEditProfile }) {
 
   const handleDelete = (e, id) => {
     e.stopPropagation();
-    if (window.confirm('Czy na pewno chcesz usunąć ten profil?')) {
+    const profile = profiles.find(p => p.id === id);
+    
+    if (profile.pin) {
+      setSelectedProfile(profile);
+      setDeleteId(id);
+      setError('');
+      setPinInput('');
+    } else if (window.confirm('Czy na pewno chcesz usunąć ten profil?')) {
       deleteProfile(id);
     }
   };
@@ -90,18 +105,40 @@ function ProfileList({ onCreateProfile, onEditProfile }) {
   const handleProfileClick = (profile) => {
     if (profile.pin) {
       setSelectedProfile(profile);
+      setError('');
+      setPinInput('');
     } else {
       onEditProfile(profile);
     }
+  };
+
+  const handlePinSubmit = (e, profile) => {
+    e.preventDefault();
+    verifyPin(profile);
   };
 
   const verifyPin = (profile) => {
     if (pinInput === profile.pin) {
       setPinInput('');
       setSelectedProfile(null);
-      onEditProfile(profile);
+      
+      if (deleteId) {
+        deleteProfile(deleteId);
+        setDeleteId(null);
+      } else {
+        onEditProfile(profile);
+      }
     } else {
       setError('Nieprawidłowy PIN');
+    }
+  };
+
+  const handleOverlayClick = (e) => {
+    if (e.target.classList.contains('pin-input-overlay')) {
+      setPinInput('');
+      setSelectedProfile(null);
+      setDeleteId(null);
+      setError('');
     }
   };
 
@@ -130,17 +167,24 @@ function ProfileList({ onCreateProfile, onEditProfile }) {
               />
             </div>
             {selectedProfile?.id === profile.id && (
-              <div className="pin-input-overlay" onClick={e => e.stopPropagation()}>
+              <form 
+                className="pin-input-overlay" 
+                onClick={handleOverlayClick}
+                onSubmit={(e) => handlePinSubmit(e, selectedProfile)}
+              >
                 <input
+                  ref={setPinInputRef}
                   type="password"
                   value={pinInput}
                   onChange={e => setPinInput(e.target.value)}
-                  placeholder="Wprowadź PIN"
+                  placeholder={deleteId ? "Wprowadź PIN aby usunąć" : "Wprowadź PIN"}
                   maxLength={4}
+                  className="pin-input-field"
+                  autoFocus
                 />
-                <button onClick={() => verifyPin(profile)}>OK</button>
+                <button type="submit">{deleteId ? 'Usuń' : 'OK'}</button>
                 {error && <div className="error-message">{error}</div>}
-              </div>
+              </form>
             )}
           </div>
         ))}

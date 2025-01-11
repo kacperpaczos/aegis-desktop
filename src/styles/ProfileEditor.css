@@ -18,6 +18,7 @@
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  margin-bottom: 10px;
 }
 
 .media-section {
@@ -59,14 +60,16 @@
 .editor-controls {
   margin-top: 30px;
   display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+  gap: 20px;
+  justify-content: center;
 }
 
 .editor-controls button {
-  padding: 8px 20px;
+  padding: 12px 30px;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
 }
 
 .avatar-section {
@@ -96,8 +99,7 @@
 .avatar-options {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   width: 100%;
   max-width: 400px;
 }
@@ -180,15 +182,23 @@
 .save-button {
   background: #2196F3;
   color: white;
-  padding: 0.5rem 2rem;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
 }
 
 .save-button:hover {
   background: #1976D2;
+  transform: translateY(-1px);
+}
+
+.cancel-button {
+  background: white;
+  color: #666;
+  border: 1px solid #ccc;
+}
+
+.cancel-button:hover {
+  background: #f5f5f5;
+  transform: translateY(-1px);
 }
 
 .remove-avatar {
@@ -206,4 +216,24 @@
 
 .remove-avatar:hover {
   background-color: #cc0000;
+}
+
+.default-avatars,
+.background-options {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.default-avatars.disabled,
+.background-options.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.avatar-options {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 400px;
 } 
